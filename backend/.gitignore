@@ -1,0 +1,5 @@
+# NodeJS modules.
+node_modules
+
+# It contains some variables I do not want to push GitHub.
+.env
