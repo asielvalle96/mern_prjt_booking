@@ -50,6 +50,8 @@ const HotelSchema = new Schema({
     type: Boolean,
     default: false
   }
-})
+},
+{ timestamps: true } /* To get the last date of creating & date of updating for each user object. */
+)
 
 export default mongoose.model('Hotel', HotelSchema)

@@ -1,21 +1,22 @@
 import { Router } from 'express'
 import { createUser, updateUser, deleteUser, getUser, getUsers } from '../controllers/user.controller.js'
+import { verifyUser, verifyAdmin } from '../middlewares/verify.middlewares.js'
 
 const router = Router()
 
 // Create.
-router.post('/', createUser)
+router.post('/', verifyAdmin, createUser)
 
 // Update.
-router.put('/:id', updateUser)
+router.put('/:id', verifyUser, updateUser)
 
 // Delete.
-router.delete('/:id', deleteUser)
+router.delete('/:id', verifyUser, deleteUser)
 
 // Get.
-router.get('/:id', getUser)
+router.get('/:id', verifyUser, getUser)
 
 // Get all.
-router.get('/', getUsers)
+router.get('/', verifyAdmin, getUsers)
 
 export default router

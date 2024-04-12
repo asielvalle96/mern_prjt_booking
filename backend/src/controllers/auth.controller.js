@@ -1,6 +1,6 @@
 import User from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
-import { createError } from './useful/error.js'
+import createError from '../useful/createError.js'
 import jwt from 'jsonwebtoken'
 
 export const register = async (req, res, next) => {
@@ -23,23 +23,20 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    // let user
-    // if (req.body.username) {
-    //   user = await User.findOne({ username: req.body.username })
-    //   if (!user) return next(createError(401, 'Wrong username!'))
-    // }
-    // if (req.body.email) {
-    //   user = await User.findOne({ email: req.body.email })
-    //   if (!user) return next(createError(401, 'Wrong email!'))
-    // }
-    const user = await User.findOne({ username: req.body.username }) || await User.findOne({ email: req.body.email })
-    if (!user) return next(createError(401, 'Wrong email!'))
+    if (!(req.body.username || req.body.email)) return next(createError(406, 'You should enter a username or email!'))
+    if (!req.body.password) return next(createError(406, 'You should enter a password!'))
+
+    let user
+    if (req.body.username) {
+      user = await User.findOne({ username: req.body.username })
+      if (!user) return next(createError(401, 'Wrong username!'))
+    }
+    if (req.body.email) {
+      user = await User.findOne({ email: req.body.email })
+      if (!user) return next(createError(401, 'Wrong email!'))
+    }
 
     const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password)
-    console.log(req.body.password)
-    console.log(user.password)
-    console.log(user)
-    console.log(isPasswordCorrect)
     if (!isPasswordCorrect) return next(createError(401, 'Wrong password!'))
 
     const { password, isAdmin, ...otherDetails } = user._doc // I want to respond with the whole object without password and isAdmin.

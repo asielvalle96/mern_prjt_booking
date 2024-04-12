@@ -7,11 +7,9 @@ export const createUser = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(req.body.password, salt)
 
-    const newUser = new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: hash
-    })
+    req.body.password = hash
+
+    const newUser = new User(req.body)
     await newUser.save()
     res.status(200).send('User has been created.')
   } catch (err) {
@@ -21,6 +19,14 @@ export const createUser = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
+    if (req.body.password) {
+      // To encrypt the password.
+      const salt = bcrypt.genSaltSync(10)
+      const hash = bcrypt.hashSync(req.body.password, salt)
+
+      req.body.password = hash
+    }
+
     const updatedUser = await User.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }) // Param { new: true } give me the updated item.
     res.status(200).json(updatedUser)
   } catch (error) {
