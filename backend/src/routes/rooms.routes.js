@@ -1,22 +1,22 @@
 import { Router } from 'express'
 import { createRoom, updateRoom, deleteRoom, getRoom, getRooms } from '../controllers/room.controller.js'
-import { verifyUser, verifyAdmin } from '../middlewares/verify.middlewares.js'
+import { verifyAdmin } from '../middlewares/verify.middlewares.js'
 
 const router = Router()
 
 // Create.
-router.post('/', verifyAdmin, createRoom)
+router.post('/:hotelId', verifyAdmin, createRoom)
 
 // Update.
-router.put('/:id', verifyUser, updateRoom)
+router.put('/:id', verifyAdmin, updateRoom)
 
 // Delete.
-router.delete('/:id', verifyUser, deleteRoom)
+router.delete('/:hotelId/:id', verifyAdmin, deleteRoom)
 
 // Get.
-router.get('/:id', verifyUser, getRoom)
+router.get('/:id', getRoom)
 
 // Get all.
-router.get('/', verifyAdmin, getRooms)
+router.get('/', getRooms)
 
 export default router
