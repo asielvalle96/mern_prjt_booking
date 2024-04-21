@@ -7,10 +7,12 @@ import { faBed, faPlane, faCar, faIcons, faTaxi, faCalendarDays, faPerson } from
 import 'react-date-range/dist/styles.css' // main css file
 import 'react-date-range/dist/theme/default.css' // theme css file
 import { DateRange } from 'react-date-range'
-// To set any format to the dates
+// To set any format to the dates using date-fns module.
 import { format } from 'date-fns'
+// react-router-dom
+import { useNavigate } from 'react-router-dom'
 
-export default function Header ({ isHome }) {
+export default function Header ({ showHeaderTitleToHeaderSearch }) {
   // Calendar of react-date-range
   const [date, setDate] = useState([
     {
@@ -19,7 +21,7 @@ export default function Header ({ isHome }) {
       key: 'selection'
     }
   ])
-  // To show and hide the calendar of date range.
+  // Calendar of date range.
   const [openDate, setOpenDate] = useState(false)
 
   // Options of the room.
@@ -54,9 +56,16 @@ export default function Header ({ isHome }) {
     }))
   }
 
+  const [destination, setDestination] = useState('') // Where are you going?
+  const navigate = useNavigate()
+  const handleSearch = () => {
+    // Sending data to List.jsx, locally.
+    navigate('/hotels', { state: { destination, date, options } })
+  }
+
   return (
     <div className='header'>
-      <div className='headerContainer'>
+      <div className={showHeaderTitleToHeaderSearch === 'si' ? 'headerContainer' : 'headerContainer listMode'}>
         <div className='headerList'>
           <div className='headerListItem active'>
             <FontAwesomeIcon icon={faBed} />
@@ -81,23 +90,29 @@ export default function Header ({ isHome }) {
         </div>
 
         {
-          isHome && (
+          showHeaderTitleToHeaderSearch === 'si' && (
             <>
               <h1 className='headerTitle'>A lifetime of discount? It is Genius</h1>
               <p className='headerDescription'>Get rewarded for your travels unlock instant savings of 10% or more with a free asiel_booking account</p>
               <button className='headerBtn'>Sign in / Register</button>
               <div className='headerSearch'>
+
+                {/* Where are you going? */}
                 <div className='headerSearchItem'>
                   <FontAwesomeIcon icon={faBed} className='headerIcon' />
-                  <input type='text' placeholder='Where are you going?' className='headerSearchInput' />
+                  <input
+                    className='headerSearchInput'
+                    type='text'
+                    placeholder='Where are you going?'
+                    onChange={e => { /* console.log('e: ', e); */ setDestination(e.target.value) }}
+                  />
                 </div>
 
                 {/* Calendar to set the date ranges. */}
                 <div className='headerSearchItem'>
                   <FontAwesomeIcon icon={faCalendarDays} className='headerIcon' />
-
-                  <span className='headerSearchText' onClick={() => setOpenDate(!openDate)}>
-                    {/* To set any format to the dates */}
+                  <span className='headerSearchText' onClick={() => { setOpenDate(!openDate); if (openOptions) setOpenOptions(!openOptions) }}>
+                    {/* To set any format to the dates using date-fns module. */}
                     {`${format(date[0].startDate, 'MM/dd/yyyy')} to ${format(date[0].endDate, 'MM/dd/yyyy')}`}
                   </span>
 
@@ -105,11 +120,11 @@ export default function Header ({ isHome }) {
                     openDate &&
                       // Calendar of react-date-range
                       <DateRange
+                        className='date'
                         editableDateInputs
-                        onChange={item => setDate([item.selection])}
+                        onChange={item => { /* console.log('item: ', item); */ setDate([item.selection]) }}
                         moveRangeOnFirstSelection={false}
                         ranges={date}
-                        className='date'
                       />
                   }
                 </div>
@@ -117,7 +132,7 @@ export default function Header ({ isHome }) {
                 {/* Options of the room. */}
                 <div className='headerSearchItem'>
                   <FontAwesomeIcon icon={faPerson} className='headerIcon' />
-                  <span className='headerSearchText' onClick={() => setOpenOptions(!openOptions)}>
+                  <span className='headerSearchText' onClick={() => { setOpenOptions(!openOptions); if (openDate) setOpenDate(!openDate) }}>
                     {`${options.adult} adult · ${options.children} children · ${options.room} room`}
                   </span>
 
@@ -155,7 +170,7 @@ export default function Header ({ isHome }) {
                 </div>
 
                 <div className='headerSearchItem'>
-                  <button className='headerBtn'>Search</button>
+                  <button className='headerBtn' onClick={handleSearch}>Search</button>
                 </div>
               </div>
             </>
